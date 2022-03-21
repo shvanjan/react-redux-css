@@ -1,0 +1,59 @@
+.table_type_list, .table_link_list {
+  list-style: none;
+
+}
+
+.table_type_list {
+	padding-left: 10px;
+	color: rgb(26, 26, 26);
+}
+
+.table_link_list {
+	margin-bottom: 20px;
+	padding: 2px;
+	padding-left: 20px;
+}
+
+.table_type {
+}
+
+
+
+.table_link {
+	font-size: 13px;
+	margin-bottom: 10px;
+	line-height: 1em;
+}
+ 
+.table_link a {
+  text-decoration: none;
+	color:  rgba(26, 26, 26, 0.8);
+}
+
+.table_type:hover {
+	color: darkblue;
+}
+
+.table_type:hover .table_link a{
+	color:  darkviolet;
+}
+
+.table_type:hover .table_link a:hover {
+	color:  darkcyan;
+
+	/*font-weight: bold;*/
+}
+
+
+
+.signin-button {
+	margin-left: 10px;
+	margin-right: 4px;
+	border-radius: 5px;
+	background-color: white;
+	color:  grey;
+	font-weight: bold;
+	padding: 5px;
+	box-shadow: blueviolet -2px 2px;	
+}
+

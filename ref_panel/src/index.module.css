@@ -1,0 +1,116 @@
+/* generic */
+
+* {
+  box-sizing: border-box;
+  /*padding: 0px;*/
+  /*margin: 0px;*/
+}
+
+div, section, nav {
+  /*border: 1px solid brown;*/
+  
+}
+
+.root {
+
+  /*width: 100%;*/
+  height: 99vh;
+  max-width: 100vw;
+  /*background-color: blue;*/
+}
+
+body, html {
+  margin: 0;
+  padding: 0;
+}
+
+
+/* grid layout */
+
+.container {
+  /*background-color: red;*/
+  display: grid;
+  height: 100%;
+  width: 100%;
+  grid-template-columns: 2fr 8fr;
+  grid-template-rows: 1fr 9fr;
+  grid-gap: 5px;
+  grid-template-areas:
+  "header header"
+  "nav content"
+}
+
+.header {
+  grid-area: header;
+}
+
+.nav {
+  grid-area: nav;
+  background-color: rgba(0, 0, 0, 0.1);
+}
+
+.content {
+  grid-area: content;
+  overflow: auto;
+  /*overflow-y: unset;*/
+
+}
+
+
+/* container other properties */
+
+.container {
+}
+
+
+/* table */
+
+
+.nav {
+  /*background-color: grey;*/
+}
+
+.footer {
+  /*background-color: white;*/
+}
+
+.db_table_parent {
+
+}
+
+.db_table {
+  /*background-color: pink;*/
+}
+
+
+/* header */
+.header {
+  /*position: relative;*/
+  background-color: #1a73e8;
+  /*padding: 10px;*/
+  height: 100%;
+  color:  white;
+}
+
+
+
+h1 {
+  margin: 0 auto;
+  /*width: fit-content;*/
+}
+
+.signin-button {
+  /*position: relative;*/
+  /*float: right;*/
+
+}
+
+.welcome-message {
+  /*position: relative;*/
+  /*float: right;*/
+  /*margin-right: 5px;*/
+}
+
+
+
+

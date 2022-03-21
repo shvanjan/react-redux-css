@@ -1,0 +1,74 @@
+$base-color: #bdbaba;
+
+.content-span {
+   border: 1px solid $base-color;
+  padding: 2px 6px;
+  /*margin: 0;*/
+  color:  rgb(119 119 119);
+  border-radius: 10px ;
+  display: inline-block;
+  width: 100px;
+  /*height: 50px;*/
+  word-wrap: unset;
+  /*vertical-align: m;*/
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+
+.table-head {
+	color: rgb(119, 119, 119);
+}
+
+.my-row, tr {
+  height: 60px;
+  overflow: hidden;
+}
+
+tr td {
+   height: auto !important;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+.cell_link {
+  position: absolute;
+  overflow: unset;
+  top:  30px;
+  stroke:  $base-color;
+  opacity: 0.2;
+  fill:  $base-color;
+}
+
+.my-cell:hover .content-span {
+	border-color: blue;
+	background-color: blue;
+	color: white;
+}
+
+.my-cell:hover .cell_link {
+  stroke: blue;
+  fill:  blue;
+  opacity: 1;
+}
+
+.my-cell {
+  width: 130px !important;
+  height: 60px !important;
+  position: relative;
+  display: inline flex;
+  justify-content: center;
+
+}
+
+.cell_link2 {
+position: relative;
+  overflow: unset;
+  // top:  30px;
+  stroke:  $base-color;
+  opacity: 0.2;
+  fill:  $base-color;
+}
