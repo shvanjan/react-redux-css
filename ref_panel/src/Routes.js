@@ -11,7 +11,14 @@ import App from "./App";
 
 import PointsTable from "./views/PointsTable";
 import TeamsTable from "./views/TeamsTable";
+
+
 import CampaignsTable from "./views/CampaignsTable";
+import GratificationsTable from "./views/GratificationsTable";
+import TaskTable from "./views/TaskTable";
+
+import UserBindRequests from "./views/UserBindRequests";
+
 import LoginPage from "./views/LoginPage";
 import {REQUEST_NAMES} from "./network/network_enums";
 
@@ -33,12 +40,12 @@ import {REQUEST_NAMES} from "./network/network_enums";
         {
           name: 'Tasks',
           dbName: REQUEST_NAMES.TASKS,
-          component: CampaignsTable
+          component: TaskTable
         },
         {
           name: 'Gratifications',
           dbName: REQUEST_NAMES.GRATIFICATIOS,
-          component: TeamsTable
+          component: GratificationsTable
 
         }
         ]
@@ -49,7 +56,7 @@ import {REQUEST_NAMES} from "./network/network_enums";
         {
           name: 'User Bind Requests',
           dbName: REQUEST_NAMES.USER_BIND_REQUESTS,
-          component: TeamsTable
+          component: UserBindRequests
         }, 
         {
           name: 'User Mappings',

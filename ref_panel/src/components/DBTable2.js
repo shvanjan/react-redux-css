@@ -33,6 +33,9 @@ import SearchIcon from "@material-ui/icons/Search";
 import InputBase from "@material-ui/core/InputBase";
 import styles from "../index.module.css";
 
+
+import processFormFeilds from "../processFormFeilds";
+
 function createData(name, calories, fat, carbs, protein) {
   return {
     name,
@@ -230,6 +233,7 @@ EnhancedTableHead.propTypes = {
 const EnhancedTableToolbar = (props) => {
   const { numSelected, title, 
     rows, setRows, setDataLoaded, 
+    dataLoaded,
     searchField, searchFieldName, 
           setPage, rowName, openForm } = props;
 
@@ -281,7 +285,7 @@ const EnhancedTableToolbar = (props) => {
 
       <div className="header-right">
         <SearchInput {...{rows, setRows, setDataLoaded, 
-          searchField, searchFieldName, 
+          searchField, searchFieldName, dataLoaded,
           setPage}}/>
         <AddEntryIcon {...{rowName, openForm}}/>
       </div>
@@ -296,6 +300,7 @@ EnhancedTableToolbar.propTypes = {
 export default function EnhancedTable({requestName, formFields, 
   rowName, keyField = "id", enableSearch = true, searchField, 
   searchFieldName}) {
+
   const [order, setOrder] = React.useState('asc');
   const [orderBy, setOrderBy] = React.useState("id");
   const [selected, setSelected] = React.useState([]);
@@ -393,13 +398,17 @@ export default function EnhancedTable({requestName, formFields,
   const emptyRows =
     page > 0 ? Math.max(0, (1 + page) * rowsPerPage - rows.length) : 0;
 
+  processFormFeilds(formFields);
+
   return (
     <Box  className={styles.db_table_parent} sx={{ width: '100%' }}>
       <Paper sx={{ width: '100%', mb: 2, overflow: 'hidden' }}>
-        <EnhancedTableToolbar {...{rows, setRows, setDataLoaded, 
+        <EnhancedTableToolbar {...{
+          rows, setRows, setDataLoaded,
+          dataLoaded, 
     searchField, searchFieldName, 
           setPage, rowName, openForm}} title={rowName} numSelected={selected.length} />
-        <TableContainer sx={{ maxHeight: 440 }}  className={styles.db_table}>
+        <TableContainer   className={styles.db_table}>
           <Table stickyHeader
             sx={{ minWidth: 750 }}
             aria-labelledby="tableTitle"
@@ -482,10 +491,14 @@ export default function EnhancedTable({requestName, formFields,
 
 
 function SearchInput({rows, setRows, setDataLoaded, 
-          searchField, searchFieldName, 
+          searchField, searchFieldName, dataLoaded,
           setPage}) {
   const [completeList, setCompleteList] = React.useState(rows);
 
+
+  React.useEffect(() => {
+    setCompleteList(rows);
+  }, [dataLoaded])
 
   return (
     <div className = "search-div">

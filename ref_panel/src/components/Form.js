@@ -66,16 +66,23 @@ function FormHeader({heading, method}) {
 		)
 }
 
-function FormField({method, fieldName, value,
- name, placeholder, type = "number", 
- isForeignKey = false, forgein_key_info,
- required = true}) {
+export function FormField({method, fieldName, value,
+	 name, placeholder, type = "number", 
+	 isForeignKey = false, forgein_key_info,
+	 required = true, range, editMode,
+	closeInput}) {
 	const [inputValue, setValue] = React.useState(value||"");
 	const [listLoaded, setListLoaded] = React.useState(false);
 	const [foreignKeyList, setList] = React.useState([]);
 	placeholder = placeholder || fieldName;
+	required = false; 
 	let className = required? "form_field required": "form_field"; 
-	let inputNode;
+	className = editMode? "in-place-edit": className;
+	let inputNode, step;
+	if(type==="date") {
+		type = "datetime-local";
+		step = 1;
+	}
 
 	React.useEffect(() => {
 		if(isForeignKey) {
@@ -96,55 +103,97 @@ function FormField({method, fieldName, value,
 		}
 	}, [listLoaded])
 
-	if(!isForeignKey) {
+	React.useEffect(() => {
+		inputNode && inputNode.focus();
+		if(type==="datetime-local" && value) {
+			let parts = value.split(" ");
+			setValue(parts[0] + "T" + parts[1]);
+		}
+	}, [inputNode])
+
+
+	const onChange = (e) => {
+					// e.preventDefault();
+					if(method !== METHOD_TYPES.GET) {
+						setValue(e.target.value);
+					}
+				};
+
+    const onBlur = (e) => {
+					// e.preventDefault();
+					editMode && closeInput && closeInput(e.target.value);
+				};
+
+	if(!isForeignKey && !range) {
 
 	return (<div className = {className}> 	
 				<label htmlFor={name}>{fieldName}</label>
 				<input className="form_input" type={type} placeholder={placeholder} 
 				value={inputValue} required={required} name={name}
+				step={step}
+				ref={(node)=>inputNode=node}
 				onKeyDown = {
 					(e) => {
 						if(e.keyCode == 13) {
 							e.preventDefault();
+							editMode &&  closeInput && closeInput(e.target.value);
 						}
 					}
 				}
-				onChange = {(e) => {
-					// e.preventDefault();
-					if(method !== METHOD_TYPES.GET) {
-						setValue(e.target.value);
-					}
-				}}
+				onChange = {onChange}
+				onBlur = {onBlur}
 				/>
 			</div>);
 	} else {
 
 
 
-		return listLoaded?(
+		return (listLoaded || range)?(
 			<div className = {className}> 	
 				<label htmlFor={name}>{fieldName}</label>
-				<select className="form_input" value={inputValue} required={required} name={name}
-			onChange = {(e) => {
-					// e.preventDefault();
-					if(method !== METHOD_TYPES.GET) {
-						setValue(e.target.value);
-					}
-				}}
+				<DropDownInput {...{
+					inputValue, 
+					rangeOfValues: range || foreignKeyList, 
+					method,
+					required,
+					name,
+					isForeignKey, keyName: isForeignKey && forgein_key_info.keyName,
+					setValue, onBlur, onChange}}/>
+
+				
+  		</div>):null;
+	}
+
+}
+
+
+
+function DropDownInput({inputValue, rangeOfValues, 
+	isForeignKey, required, keyName, name, setValue, method,
+onChange, onBlur}) {
+	let inputNode;
+	React.useEffect(() => {
+		inputNode && inputNode.focus();
+	}, [inputNode]);
+
+	return (
+		<select className="form_input" value={inputValue} required={required} name={name}
+			onChange = {onChange}
+			onBlur = {onBlur}
+			ref={(node)=>inputNode=node}
+
 			>
 			{method !== METHOD_TYPES.GET? (<>
-				{foreignKeyList.map((foreignKeyRow) => {
-					let value = foreignKeyRow[forgein_key_info.keyName];
-					return <option key={value} value={value}>{value}</option>
+				{rangeOfValues.map((foreignKeyRow) => {
+					let value = isForeignKey? foreignKeyRow[keyName] : foreignKeyRow;
+					let key = isForeignKey? foreignKeyRow["id"] : foreignKeyRow;
+					return <option key={key} value={value}>{value}</option>
 
 				})}
 			    
 			</>): (<><option value={inputValue}>{inputValue}</option></>)}
-   
-  		</select>
-  		</div>):null;
-	}
-
+			</select>
+		);
 }
 
 function submitForm(event, requestName, method, inputData, formFields, keyField, callback) {

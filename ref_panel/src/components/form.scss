@@ -55,6 +55,13 @@ label {
 	// width: 100%;
 }
 
+.in-place-edit label {
+	display: none;
+}
+
+
+
+
 .form_input {
 	display: block;
 	width: calc(100%);

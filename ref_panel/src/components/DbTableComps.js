@@ -12,7 +12,7 @@ import * as React from 'react';
 import AddIcon from '@mui/icons-material/AddCircleOutline';
 import Checkbox from '@mui/material/Checkbox';
 import { useSelector, useDispatch } from 'react-redux';
-
+import {FormField} from "../components/Form";
 
 
 const SORT_ORDERS = {
@@ -115,6 +115,15 @@ export function DBTableRow({requestName, formFields, setDataLoaded,
   let hasWritePermission = useSelector(state => state.login.userInfo.permissions.can_edit);
 
 
+   function updateRow(new_data) {
+      let rest_param = [data[keyField]];
+      let updated_data = {...data, ...new_data};
+      nw.request(requestName, METHOD_TYPES.PUT, rest_param, JSON.stringify(updated_data), () => {
+        setDataLoaded(false);
+      });
+
+   } 
+
    function IconsCell(data) {
      return (
 
@@ -145,7 +154,7 @@ export function DBTableRow({requestName, formFields, setDataLoaded,
                         }}
                       />}
             </TableCell>
-    );
+        );
              
   }
 
@@ -185,18 +194,19 @@ export function DBTableRow({requestName, formFields, setDataLoaded,
                         {row[keyField]}
                       </TableCell>*/}
                       {
-                        formFields.map(({name: fieldName, type, fields}) => {
+                        formFields.map((fieldData) => {
+                          let {name: fieldName, type, fields} = fieldData; 
                           let value = data[fieldName];
 
                           if(type !== "json") {
-                            return <DBTableCell {...{value, type, fieldName}} key={fieldName}/>
+                            return <DBTableCell {...{value, updateRow, ...fieldData}} key={fieldName}/>
                           } else {
                             let data2 = data[fieldName];
                             return fields.map(({name: fieldName, type}) => {
 
                               let value = data2[fieldName];
                               
-                              return <DBTableCell {...{value, type, fieldName}} key={fieldName}/>
+                              return <DBTableCell {...{value, updateRow, ...fieldData}} key={fieldName}/>
                             })
                           }
 
@@ -209,18 +219,58 @@ export function DBTableRow({requestName, formFields, setDataLoaded,
                   
 }
 
-function DBTableCell({value, type, fieldName}) {
+function DBTableCell({value, updateRow, ...fieldData}) {
+
+    const [editMode, setEditMode] = React.useState(false);
+    const {type, fieldName, name} = fieldData;
+    let prevValue;
     if(type === "date") {
+      prevValue = value;
       value = (new Date(value)).toLocaleString()
     }
 
+  let hasWritePermission = useSelector(state => state.login.userInfo.permissions.can_edit);
 
+  function openEditBox() {
+    setEditMode(true);
+  }
 
-   return (<TableCell align={(type=="number")?"right":"center"} key={fieldName}>
-                      <span className = {type}>
-                      {type === "url"? 
-                      <a href = {value}>{value}</a>: value }
-                      </span>
-                      
+   return (<TableCell align={(type=="number")?"right":"center"} 
+     key={fieldName}
+
+     >
+                      {!editMode &&  
+                        <span className = {type}
+                          onDoubleClick = {() => {
+                            openEditBox();
+                          }}
+                        >
+                          {type === "url"? 
+                          <a href = {value}>{value}</a>: value }
+                        </span>
+                      }  
+                      {!editMode && hasWritePermission && <EditIcon
+                        className="in-place-edit-icon"
+                        onClick={() => {
+                          openEditBox();
+                        }}
+                      />}
+                      {
+                        editMode && <FormField {...{
+                          method: METHOD_TYPES.PUT,
+                          value: prevValue || value,
+                          editMode: true,
+                          closeInput: (new_value) => {
+                            if(new_value != value) {
+                              updateRow({
+                                [name]: value
+                              });
+                            }
+                            
+                            setEditMode(false);
+                          },
+                          ...fieldData
+                        }}/>
+                      }
                       </TableCell>)
 }

@@ -8,9 +8,28 @@
 [class^=MuiTableCell] {
 	// color: blue;
 	overflow-wrap: break-word;
+	position: relative;
 	max-width: 250px;
 	padding: 0;
 
+}
+
+.in-place-edit-icon {
+	display: none !important;
+	position: absolute;
+	right: 0;
+	bottom: 0;
+	opacity: 0.5;
+}
+
+[class^=MuiTableCell]:hover .in-place-edit-icon {
+	
+	display: inline-block !important;
+
+}
+
+[class^=MuiTableCell]:hover {
+	border: 1px solid rgba(0, 0, 0, 0.2);
 }
 
 .header {
