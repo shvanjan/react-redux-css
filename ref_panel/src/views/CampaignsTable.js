@@ -89,7 +89,7 @@ is_active
 			fieldName: "Campaign Id",
 			name: "campaign_id",
 			type: "text",
-			inForm: false
+			inForm: true
 
 		},
 		{

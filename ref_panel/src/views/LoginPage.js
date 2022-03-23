@@ -50,7 +50,7 @@ export default function LoginPage() {
           method: METHOD_TYPES.POST, 
           heading: "Login Details", 
           showCancel: false,
-          closeMethod: ({user_info}) => {
+          closeMethod: ({user_info} = {}) => {
             if(user_info) {
               callLogin(user_info);
             } else {

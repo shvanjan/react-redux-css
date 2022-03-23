@@ -172,7 +172,7 @@ function EnhancedTableHead(props) {
           return (
               <TableCell
             key={headCell.name}
-            align={headCell.type === "number" ? 'right' : 'center'}
+            align={headCell.type === "number" ? 'left' : 'left'}
             padding={headCell.disablePadding ? 'none' : 'normal'}
             sortDirection={orderBy === headCell.name ? order : false}
           >
@@ -330,9 +330,14 @@ export default function EnhancedTable({requestName, formFields,
    }, [keyField])
 
   React.useEffect(() => {
-    
-     !dataLoaded && nw.request(requestName, METHOD_TYPES.GET).then((data) => {
-      setRows(data.list);
+      const IS_LOGS = requestName.includes('logs');
+      const rest_params = [];
+      if(IS_LOGS) {
+        rest_params.push(1, 1);
+      }
+     !dataLoaded && nw.request(requestName, METHOD_TYPES.GET, rest_params).then((data) => {
+      const dataList = IS_LOGS? data.page.content: data.list;
+      setRows(dataList);
       setDataLoaded(true);
     }, () => {
       setRows([]);
@@ -399,6 +404,10 @@ export default function EnhancedTable({requestName, formFields,
     page > 0 ? Math.max(0, (1 + page) * rowsPerPage - rows.length) : 0;
 
   processFormFeilds(formFields);
+
+  if(!dataLoaded) {
+    return 'loading...';
+  }
 
   return (
     <Box  className={styles.db_table_parent} sx={{ width: '100%' }}>

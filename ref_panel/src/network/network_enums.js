@@ -1,4 +1,6 @@
-export const SERVER_URL = "https://securebox.gamepind.com/ref_panel/api/v1/";
+export const SERVER_URL = "https://manojtestapi.herokuapp.com/https://securebox.gamepind.com/ref_panel/api/v1/";
+// export const SERVER_URL = "https://studiobox1.gamepind.com/ref_panel/api/v1/";
+// export const isMocked = false;
 export const isMocked = true;
 
 export const REQUEST_NAMES = {

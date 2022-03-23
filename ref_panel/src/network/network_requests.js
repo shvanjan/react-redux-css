@@ -20,7 +20,6 @@ const nw = {
         let final_url = SERVER_URL + url + getRestUrl(rest_params || []);
         console.log( "url: " + final_url + " method: " + method);
         let response;
-
         if(this.isMocked()) {
             return new Promise((resolve) => {
                 setTimeout(() => {

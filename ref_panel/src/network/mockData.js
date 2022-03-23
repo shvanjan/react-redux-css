@@ -6,6 +6,7 @@ export default function getMockData(taskName, methodType) {
 	};
 
     // taskName = taskName.split("/")[0];
+    
 	switch(methodType) {
         case METHOD_TYPES.GET:
             switch(taskName) {
@@ -278,10 +279,56 @@ export default function getMockData(taskName, methodType) {
                         {"id":5,"campaign_title":"","campaign_id":"","campaign_type":null,"campaign_property":null,"game_pid":null,"campaign_landing_url":null,"gratification_currency":null,"gratification_description":null,"referrer_gratification_limit":null,"referrer_max_limit_daily":null,"referrer_max_count_daily":null,"referrer_max_limit":null,"start_date":"0000-00-00 00:00:00","end_date":"0000-00-00 00:00:00","created_date":"2020-09-16 14:46:47","is_active":0},{"id":6,"campaign_title":"App install bonus New Test Update","campaign_id":"GP-CE9VF","campaign_type":"PLATFORM","campaign_property":"PP_PAYTM","game_pid":null,"campaign_landing_url":"https://testgp.gamepind.com","gratification_currency":"BEANS","gratification_description":null,"referrer_gratification_limit":100,"referrer_max_limit_daily":25,"referrer_max_count_daily":5,"referrer_max_limit":9,"start_date":"2017-12-01 13:13:29","end_date":"2022-01-01 00:00:00","created_date":"2020-02-16 16:24:51","is_active":1},{"id":8,"campaign_title":"Testing App install bonus New Test Update","campaign_id":"GP-CE9VF","campaign_type":"GAME","campaign_property":"PP_PAYTM","game_pid":"123123","campaign_landing_url":"https://testgp.gamepind.com","gratification_currency":"BEANS","gratification_description":null,"referrer_gratification_limit":100,"referrer_max_limit_daily":25,"referrer_max_count_daily":5,"referrer_max_limit":9,"start_date":"2020-02-10 13:13:29","end_date":"2020-12-10 00:00:00","created_date":"2022-03-07 09:32:40","is_active":1}
                     ];
                     break;
-                
+                case REQUEST_NAMES.USER_BIND_REQUESTS:
+                    mockData.page = 
+                        {
+                            "content":
+                                [
+                                    {
+                                        "id":795,
+                                        "campaign_id":"GP-CE9VF1",
+                                        "campaign_property":"PP_APP",
+                                        "referrer_masked_msisdn":"925526584357",
+                                        "referred_masked_msisdn":"925525929923",
+                                        "status":"MAPPED",
+                                        "validation_fail_reason":null,
+                                        "maq_response":"MaquetteSuccessResponse(session_id=9f64bb27-3905-4021-8de5-c6ffe9b81014, status=SUCCESS, action_recommended=PASS, action_recommended_type=ActionCode, actions=null, reason=null, messages={user=null, cst=[]}, extra_options={})",
+                                        "channel":"BINDAPI",
+                                        "creation_date":"2022-03-15 10:51:15",
+                                        "maq_request":"{\"source\": \"PAYTMFIRSTGAMES\", \"sessionId\": \"9f64bb27-3905-4021-8de5-c6ffe9b81014\", \"evaluationType\": \"referral\", \"requestPayload\": {\"gameid\": \"\", \"taskid\": \"\", \"property\": \"PP_APP\", \"campaignId\": \"GP-CE9VF1\", \"campaignType\": \"PLATFORM\", \"referredEmail\": \"\", \"referrerEmail\": \"$tkn5E7520928C9721EA08F02C1FE2F22361\", \"appVersionName\": \"\", \"referredMaskId\": \"925525929923\", \"referrerMaskId\": \"925526584357\", \"appVersionNumber\": \"\", \"referredDeviceId\": \"64319d8581f1170b\", \"referredLastName\": \"\", \"referrerDeviceId\": \"\", \"referrerLastName\": \"rawat\", \"referrerNickName\": \"adfoy04882\", \"referredFirstName\": \"\", \"referrerFirstName\": \"ajay\", \"referrerdNickName\": \"cpfjh61141\", \"referredCustomerId\": \"1000902591\", \"referrerCustomerId\": \"9234585780\", \"referredPhoneNumber\": \"688666002145064\", \"referrerPhoneNumber\": \"688666001751246\"}, \"requestMetadata\": {\"deviceId\": \"64319d8581f1170b\", \"customerId\": \"1000902591\", \"phone_number\": \"688666002145064\", \"customer_email\": \"\"}}",
+                                        "impression_response":"<200 OK OK,AntiFraudImpressionResponseEntity(code=2001, message=Success, status=SUCCESS, count=0, appList=[]),[access-control-allow-headers:\"Content-Type,Accept,property,plugin,spsAuthKey,APIKeyAuthorization,accesstokenauthorization,apikeyauthorization,device_id,AccessTokenAuthorization,Authorization,user_id,field,source,x-requested-with,x-requested-by,mobile_number,sso_token,mid,guid,page_size,start_count,product_id,omgaccesstoken,nonce\", access-control-allow-origin:\"*\", connection:\"keep-alive\", content-type:\"application/json\", date:\"Tue, 15 Mar 2022 05:22:25 GMT\", server:\"nginx/1.16.1\", transfer-encoding:\"chunked\"]>"
+                                    }
+                                ],
+                                "pageable": {
+                                    "sort":{
+                                        "sorted":true,
+                                        "empty":false,
+                                        "unsorted":false
+                                    },
+                                    "pageNumber":1,
+                                    "pageSize":1,
+                                    "offset":1,
+                                    "unpaged":false,
+                                    "paged":true
+                                },
+                                "last":false,
+                                "totalPages":384,
+                                "totalElements":384,
+                                "sort":{
+                                    "sorted":true,
+                                    "empty":false,
+                                    "unsorted":false
+                                },
+                                "size":1,
+                                "number":1,
+                                "numberOfElements":1,
+                                "first":false,
+                                "empty":false
+                        };
+                        break;
             }
                 
-
+            break;
             case METHOD_TYPES.POST:
                 switch(taskName) {
                     case REQUEST_NAMES.LOGIN:

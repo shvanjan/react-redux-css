@@ -104,8 +104,6 @@ function ColumnHead({fieldName: headerName, name, type, sortFn,
         )
 }
 
-
-
 export function DBTableRow({requestName, formFields, setDataLoaded, 
   openForm, keyField,
    handleClick, isItemSelected, labelId, 
@@ -118,6 +116,8 @@ export function DBTableRow({requestName, formFields, setDataLoaded,
    function updateRow(new_data) {
       let rest_param = [data[keyField]];
       let updated_data = {...data, ...new_data};
+      console.log("updated data");
+      console.log(updated_data);
       nw.request(requestName, METHOD_TYPES.PUT, rest_param, JSON.stringify(updated_data), () => {
         setDataLoaded(false);
       });
@@ -221,56 +221,115 @@ export function DBTableRow({requestName, formFields, setDataLoaded,
 
 function DBTableCell({value, updateRow, ...fieldData}) {
 
+    //expanded - null: no need to expand/ collapse, 
+      //false: can be expanded
+      // true: can be collapsed
+
     const [editMode, setEditMode] = React.useState(false);
     const {type, fieldName, name} = fieldData;
-    let prevValue;
-    if(type === "date") {
-      prevValue = value;
-      value = (new Date(value)).toLocaleString()
-    }
+    const [expanded, setExpanded] = React.useState(null);
+    const [displayValue, setDisplayValue] = React.useState("");
+
+   
+
+    React.useEffect(() => {
+      if(type === "text" && value && value.length > 100) {
+        setExpanded(false);
+      } else {
+        setExpanded(null);
+      }
+      
+      setDisplayValue(getDisplayValue(value, type, expanded));
+    }, [value]);
+    
 
   let hasWritePermission = useSelector(state => state.login.userInfo.permissions.can_edit);
+ 
 
   function openEditBox() {
     setEditMode(true);
   }
 
-   return (<TableCell align={(type=="number")?"right":"center"} 
+   return (<TableCell className="db-table-cell" align={(type=="number")?"center":"center"} 
      key={fieldName}
 
      >
-                      {!editMode &&  
-                        <span className = {type}
-                          onDoubleClick = {() => {
-                            openEditBox();
-                          }}
-                        >
-                          {type === "url"? 
-                          <a href = {value}>{value}</a>: value }
-                        </span>
-                      }  
-                      {!editMode && hasWritePermission && <EditIcon
-                        className="in-place-edit-icon"
-                        onClick={() => {
-                          openEditBox();
-                        }}
-                      />}
-                      {
-                        editMode && <FormField {...{
-                          method: METHOD_TYPES.PUT,
-                          value: prevValue || value,
-                          editMode: true,
-                          closeInput: (new_value) => {
-                            if(new_value != value) {
-                              updateRow({
-                                [name]: value
-                              });
-                            }
-                            
-                            setEditMode(false);
-                          },
-                          ...fieldData
-                        }}/>
-                      }
-                      </TableCell>)
+        
+        
+        {!editMode &&  (
+          <>
+          <ToggleExpand 
+          {...{ expanded, setDisplayValue, setExpanded, value}}/>
+
+          <span className = {type}
+            onDoubleClick = {() => {
+              openEditBox();
+            }}
+          >
+            {type === "url"? 
+            <a href = {value}>{displayValue}</a>: displayValue }
+          </span>
+
+          {hasWritePermission && (<EditIcon
+          className="in-place-edit-icon"
+          onClick={() => {
+            openEditBox();
+          }}/>)}
+          
+          </>
+         )
+        }  
+        
+        
+        {
+          editMode && <FormField {...{
+            method: METHOD_TYPES.PUT,
+            value,
+            editMode: true,
+            closeInput: (new_value) => {
+              if(new_value != value) {
+                updateRow({
+                  [name]: new_value
+                });
+              }
+              
+              setEditMode(false);
+            },
+            ...fieldData
+          }}/>
+        }
+
+        
+        
+    </TableCell>)
+}
+
+
+function ToggleExpand({expanded, setDisplayValue, setExpanded, value}) {
+
+  if(expanded === null) {
+    return null;
+  }
+
+  let finalExpanded = !expanded;
+  let finalDisplayValue = getDisplayValue(value, "text", finalExpanded);
+  let spanText = expanded? "<<": ">>";
+
+  return <span className={"expand-collapse-cell " + expanded} onClick = {() => {
+    setDisplayValue(finalDisplayValue);
+    setExpanded(finalExpanded);
+  }}>{spanText}</span>;
+
+}
+
+function getDisplayValue(value, type, expanded) {
+  if(type === "text" && value && value.length > 100) {
+      let len = value.length;
+      return expanded? value: value.substr(0, 10) + "...." + value.substr(len-10, len);
+    } else if(type === "date") {
+      return (new Date(value)).toLocaleString();
+    } else {
+      return value;
+    }
+
 }

@@ -186,8 +186,7 @@ onChange, onBlur}) {
 			{method !== METHOD_TYPES.GET? (<>
 				{rangeOfValues.map((foreignKeyRow) => {
 					let value = isForeignKey? foreignKeyRow[keyName] : foreignKeyRow;
-					let key = isForeignKey? foreignKeyRow["id"] : foreignKeyRow;
-					return <option key={key} value={value}>{value}</option>
+					return <option key={value} value={value}>{value}</option>
 
 				})}
 			    

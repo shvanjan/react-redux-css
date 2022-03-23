@@ -5,12 +5,16 @@
 }
 
 
-[class^=MuiTableCell] {
+[class^=MuiTableCell].db-table-cell {
 	// color: blue;
 	overflow-wrap: break-word;
+	// overflow-wrap: normal;
 	position: relative;
 	max-width: 250px;
-	padding: 0;
+	padding: 5px;
+	// color: red;
+	// max-height: 200px;
+	// overflow: hidden;
 
 }
 
@@ -19,8 +23,52 @@
 	position: absolute;
 	right: 0;
 	bottom: 0;
+	float: right;
 	opacity: 0.5;
 }
+
+.expand-collapse-cell {
+	display: inline;
+	position: absolute;
+	transform: rotate(0deg);
+	font-size: 15px;
+	font-weight: bold;
+
+	opacity: 1;
+	color: blue;
+	left: 2px;
+	top: 0;
+}
+
+.expand-collapse-cell.false:hover::after{
+	content: "click to expand";
+	min-width: fit-content;
+	position: absolute;
+	font-size: 10px;
+	color: rgba(0, 0, 0, 0.5);
+	border: 1px solid rgba(0, 0, 0, 0.3);
+	border-radius: 4px;
+	width: 80px;
+	top: 15px;
+	left: 2px;
+	overflow: visible;
+
+}
+
+.expand-collapse-cell.true:hover::after{
+	content: "";
+}
+
+.expand-collapse-cell.true {
+	display: inline-block;
+	transform: rotate(-90deg);
+}
+
+// .expand-collapse-cell::after {
+// 	position: relative;
+// 	content: "...";
+// 	transform: rotate(-90deg);
+// }
 
 [class^=MuiTableCell]:hover .in-place-edit-icon {
 	
@@ -105,7 +153,7 @@
 
 .search_input {
 	// background-color: lightblue;
-	width: 200px;
+	width: 220px;
 	margin-right: -40px;
 	padding-left: 10px;
 	height: 30px;
