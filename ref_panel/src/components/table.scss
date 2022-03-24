@@ -11,11 +11,16 @@
 	// overflow-wrap: normal;
 	position: relative;
 	max-width: 250px;
-	padding: 5px;
+	padding: 15px;
 	// color: red;
 	// max-height: 200px;
 	// overflow: hidden;
 
+}
+
+.dotted {
+	color: blue;
+	font-size: 20px;
 }
 
 .in-place-edit-icon {
@@ -31,37 +36,37 @@
 	display: inline;
 	position: absolute;
 	transform: rotate(0deg);
-	font-size: 15px;
+	font-size: 20px;
 	font-weight: bold;
 
 	opacity: 1;
-	color: blue;
+	color: rgba(0, 0, 0, 0.5);
 	left: 2px;
 	top: 0;
 }
 
-.expand-collapse-cell.false:hover::after{
-	content: "click to expand";
-	min-width: fit-content;
-	position: absolute;
-	font-size: 10px;
-	color: rgba(0, 0, 0, 0.5);
-	border: 1px solid rgba(0, 0, 0, 0.3);
-	border-radius: 4px;
-	width: 80px;
-	top: 15px;
-	left: 2px;
-	overflow: visible;
+// .expand-collapse-cell.false:hover::after{
+// 	content: "click to expand";
+// 	min-width: fit-content;
+// 	position: absolute;
+// 	font-size: 10px;
+// 	color: rgba(0, 0, 0, 0.5);
+// 	border: 1px solid rgba(0, 0, 0, 0.3);
+// 	border-radius: 4px;
+// 	width: 80px;
+// 	top: 15px;
+// 	left: 2px;
+// 	overflow: visible;
 
-}
+// }
 
-.expand-collapse-cell.true:hover::after{
-	content: "";
-}
+// .expand-collapse-cell.true:hover::after{
+// 	content: "";
+// }
 
 .expand-collapse-cell.true {
 	display: inline-block;
-	transform: rotate(-90deg);
+	transform: rotate(90deg);
 }
 
 // .expand-collapse-cell::after {

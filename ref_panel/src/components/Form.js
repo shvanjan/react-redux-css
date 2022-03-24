@@ -121,7 +121,7 @@ export function FormField({method, fieldName, value,
 
     const onBlur = (e) => {
 					// e.preventDefault();
-					editMode && closeInput && closeInput(e.target.value);
+					editMode && closeInput && closeInput();
 				};
 
 	if(!isForeignKey && !range) {
@@ -136,7 +136,7 @@ export function FormField({method, fieldName, value,
 					(e) => {
 						if(e.keyCode == 13) {
 							e.preventDefault();
-							editMode &&  closeInput && closeInput(e.target.value);
+							editMode &&  closeInput && closeInput(e.target.value, true);
 						}
 					}
 				}

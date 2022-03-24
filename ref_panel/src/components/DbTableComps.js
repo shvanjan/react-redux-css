@@ -13,7 +13,7 @@ import AddIcon from '@mui/icons-material/AddCircleOutline';
 import Checkbox from '@mui/material/Checkbox';
 import { useSelector, useDispatch } from 'react-redux';
 import {FormField} from "../components/Form";
-
+import ArrowRightIcon from '@mui/icons-material/ArrowRight';
 
 const SORT_ORDERS = {
   ASC: 1,
@@ -267,7 +267,7 @@ function DBTableCell({value, updateRow, ...fieldData}) {
             }}
           >
             {type === "url"? 
-            <a href = {value}>{displayValue}</a>: displayValue }
+            <a href = {value}>{displayValue}</a>: <DisplaySpan {...{displayValue, type}}/> }
           </span>
 
           {hasWritePermission && (<EditIcon
@@ -286,8 +286,8 @@ function DBTableCell({value, updateRow, ...fieldData}) {
             method: METHOD_TYPES.PUT,
             value,
             editMode: true,
-            closeInput: (new_value) => {
-              if(new_value != value) {
+            closeInput: (new_value, submitted) => {
+              if(submitted && new_value != value) {
                 updateRow({
                   [name]: new_value
                 });
@@ -304,6 +304,21 @@ function DBTableCell({value, updateRow, ...fieldData}) {
     </TableCell>)
 }
 
+function DisplaySpan({displayValue, type}) {
+  let dots = "....";
+  let dotted = displayValue && type === "text" && displayValue.includes("....");
+  if(dotted) {
+    let parts = displayValue.split("....")
+    return (<> 
+        {parts[0]}
+        <span className="dotted">....</span>
+        {parts[1]}
+      </>);
+  } else {
+    return <>{displayValue}</>
+  }
+
+}
 
 function ToggleExpand({expanded, setDisplayValue, setExpanded, value}) {
 
@@ -318,14 +333,18 @@ function ToggleExpand({expanded, setDisplayValue, setExpanded, value}) {
   return <span className={"expand-collapse-cell " + expanded} onClick = {() => {
     setDisplayValue(finalDisplayValue);
     setExpanded(finalExpanded);
-  }}>{spanText}</span>;
+  }}><ArrowRightIcon/></span>;
 
 }
 
 function getDisplayValue(value, type, expanded) {
+  // function Dotted(){
+  //   return (<span>....</span>);
+  // }
+
   if(type === "text" && value && value.length > 100) {
       let len = value.length;
-      return expanded? value: value.substr(0, 10) + "...." + value.substr(len-10, len);
+      return expanded? value: value.substr(0, 20) + "...." + value.substr(len-20, len);
     } else if(type === "date") {
       return (new Date(value)).toLocaleString();
     } else {
@@ -333,3 +352,6 @@ function getDisplayValue(value, type, expanded) {
     }
 
 }
+
+
+
