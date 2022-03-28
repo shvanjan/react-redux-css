@@ -1,7 +1,7 @@
-export const SERVER_URL = "https://manojtestapi.herokuapp.com/https://securebox.gamepind.com/ref_panel/api/v1/";
+export const SERVER_URL = "https://securebox.gamepind.com/ref_panel/api/v1/";
 // export const SERVER_URL = "https://studiobox1.gamepind.com/ref_panel/api/v1/";
 // export const isMocked = false;
-export const isMocked = true;
+export const isMocked = false;
 
 export const REQUEST_NAMES = {
 	CAMPAIGNS: "campaigns",
@@ -12,6 +12,19 @@ export const REQUEST_NAMES = {
 	GRATIFICATION_LOGS: "logs/gratification_api_log",
 	TASK_GRATIFICATION_LOGS: "logs/task_gratification_summary",
 	LOGIN: "users/login"
+}
+
+export const METHOD_TYPES = {
+	GET: "GET",
+	PUT: "PUT",
+	POST: "POST",
+	DELETE: "DELETE"
+}
+
+export const REST_PARAMS = {
+	PUT: "edit",
+	DELETE: "delete",
+	POST: "insert"
 }
 
 // export const REQUEST_NAMES = {
@@ -26,12 +39,6 @@ export const REQUEST_NAMES = {
 
 // }
 
-export const METHOD_TYPES = {
-	GET: "GET",
-	PUT: "PUT",
-	POST: "POST",
-	DELETE: "DELETE"
-}
 
 // export const REQUEST_TYPES = {
 // 	[REQUEST_NAMES.GET_TEAMS]: "GET",

@@ -18,6 +18,9 @@ import GratificationsTable from "./views/GratificationsTable";
 import TaskTable from "./views/TaskTable";
 
 import UserBindRequests from "./views/UserBindRequests";
+import UserMappings from "./views/UserMappings";
+import LogsGratification from "./views/LogsGratification";
+import LogsTask from "./views/LogsTask";
 
 import LoginPage from "./views/LoginPage";
 import {REQUEST_NAMES} from "./network/network_enums";
@@ -61,17 +64,17 @@ import {REQUEST_NAMES} from "./network/network_enums";
         {
           name: 'User Mappings',
           dbName: REQUEST_NAMES.USER_MAPPINGS,
-          component: TeamsTable
+          component: UserMappings
         },
         {
           name: 'Gratification Logs',
           dbName: REQUEST_NAMES.GRATIFICATION_LOGS,
-          component: TeamsTable
+          component: LogsGratification
         },
         {
           name: 'Task Gratification Logs',
           dbName: REQUEST_NAMES.TASK_GRATIFICATION_LOGS,
-          component: TeamsTable
+          component: LogsTask
         }
       ]
     },
@@ -93,7 +96,7 @@ import {REQUEST_NAMES} from "./network/network_enums";
           component: TeamsTable
 
         }
-      ],
+      ]
     }
   ];
 

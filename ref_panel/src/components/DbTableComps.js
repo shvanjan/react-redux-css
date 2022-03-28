@@ -4,7 +4,7 @@ import TableRow from '@mui/material/TableRow';
 import VisibilityIcon from "@material-ui/icons/Visibility";
 import EditIcon from "@material-ui/icons/Edit";
 import DeleteIcon from "@material-ui/icons/Delete";
-import {METHOD_TYPES} from "../network/network_enums";
+import {METHOD_TYPES, REST_PARAMS} from "../network/network_enums";
 import nw from "../network/network_requests";
 import TableSortLabel from "@material-ui/core/TableSortLabel";
                // onClick={createSortHandler(columnPropName)}
@@ -110,18 +110,17 @@ export function DBTableRow({requestName, formFields, setDataLoaded,
   ...data}) {
 
   let row = {...data};
-  let hasWritePermission = useSelector(state => state.login.userInfo.permissions.can_edit);
-
+  const IS_LOGS = requestName.includes('logs');
+  let hasWritePermission = useSelector(state => state.login.userInfo.permissions.can_edit) && !IS_LOGS;
 
    function updateRow(new_data) {
-      let rest_param = [data[keyField]];
+      let rest_param = [REST_PARAMS[METHOD_TYPES.PUT]];
       let updated_data = {...data, ...new_data};
       console.log("updated data");
       console.log(updated_data);
-      nw.request(requestName, METHOD_TYPES.PUT, rest_param, JSON.stringify(updated_data), () => {
+      nw.request(requestName, METHOD_TYPES.POST, rest_param, JSON.stringify(updated_data), () => {
         setDataLoaded(false);
       });
-
    } 
 
    function IconsCell(data) {
@@ -147,7 +146,15 @@ export function DBTableRow({requestName, formFields, setDataLoaded,
                           if(requestName.includes("/")) {
                             rest_params = [];
                           }
-                          nw.request(requestName, METHOD_TYPES.DELETE, rest_params, undefined, () => {
+
+                          let body =  JSON.stringify({[keyField]: data[keyField]});
+                          let arr = [body];
+
+                          console.log(arr);
+                          console.log(body);
+                          nw.request(requestName, METHOD_TYPES.POST, [REST_PARAMS[METHOD_TYPES.DELETE]], 
+                            body, 
+                            () => {
                             setDataLoaded(false);
                           });
                           // showDeleteModal(row.id, row.name);
@@ -199,14 +206,14 @@ export function DBTableRow({requestName, formFields, setDataLoaded,
                           let value = data[fieldName];
 
                           if(type !== "json") {
-                            return <DBTableCell {...{value, updateRow, ...fieldData}} key={fieldName}/>
+                            return <DBTableCell {...{IS_LOGS, value, updateRow, ...fieldData}} key={fieldName}/>
                           } else {
                             let data2 = data[fieldName];
                             return fields.map(({name: fieldName, type}) => {
 
                               let value = data2[fieldName];
                               
-                              return <DBTableCell {...{value, updateRow, ...fieldData}} key={fieldName}/>
+                              return <DBTableCell {...{IS_LOGS, value, updateRow, ...fieldData}} key={fieldName}/>
                             })
                           }
 
@@ -219,7 +226,7 @@ export function DBTableRow({requestName, formFields, setDataLoaded,
                   
 }
 
-function DBTableCell({value, updateRow, ...fieldData}) {
+function DBTableCell({value, updateRow, IS_LOGS, ...fieldData}) {
 
     //expanded - null: no need to expand/ collapse, 
       //false: can be expanded
@@ -243,11 +250,13 @@ function DBTableCell({value, updateRow, ...fieldData}) {
     }, [value]);
     
 
-  let hasWritePermission = useSelector(state => state.login.userInfo.permissions.can_edit);
+  let hasWritePermission = useSelector(state => state.login.userInfo.permissions.can_edit) &&  !IS_LOGS;
  
 
   function openEditBox() {
-    setEditMode(true);
+    if(hasWritePermission && fieldData.inForm) {
+      setEditMode(true);
+    }
   }
 
    return (<TableCell className="db-table-cell" align={(type=="number")?"center":"center"} 
@@ -270,7 +279,7 @@ function DBTableCell({value, updateRow, ...fieldData}) {
             <a href = {value}>{displayValue}</a>: <DisplaySpan {...{displayValue, type}}/> }
           </span>
 
-          {hasWritePermission && (<EditIcon
+          {hasWritePermission && fieldData.inForm && (<EditIcon
           className="in-place-edit-icon"
           onClick={() => {
             openEditBox();

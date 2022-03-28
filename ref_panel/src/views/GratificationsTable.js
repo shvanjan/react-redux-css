@@ -129,7 +129,7 @@ referrer_amount_per_slab(Referrer/Referred amount slab)
 			isForeignKey: true,
 			forgein_key_info: {
 				tableName: REQUEST_NAMES.CAMPAIGNS,
-				keyName: 'campaign_id'
+				keyName: 'campaignId'
 			},
 			inForm: true
 		},
@@ -193,19 +193,16 @@ referrer_amount_per_slab(Referrer/Referred amount slab)
 			fieldName: "Referrer/Referred amount slab",
 			name: "referrer_amount_per_slab",
 			type: "text",
+			isLongText: true,
+			inForm: true
+		},
+		{
+			fieldName: "Is Active",
+			name: "is_active",
+			type: "number",
 			inForm: true
 		}
 	];
-
-	/*
-	 {
-            "id": 1,
-            "Campaign_name": "Antique Friend",
-            "Campaign_image_url": "https://f.hubspotusercontent10.net/hubfs/8790268/livestream/Antique%20Friends.png",
-            "createdAt": "2021-11-09T09:26:30.000Z",
-            "updatedAt": "2021-11-16T06:29:06.000Z"
-        },
-	*/
 
 	
 	let requestName = REQUEST_NAMES.GRATIFICATIOS;

@@ -62,6 +62,7 @@ export default function UserBindRequests() {
 			fieldName: "Maquette Response on UI",
 			name: "maq_response",
 			type: "text",
+			isLongText: true,
 			inForm: true
 			
 		},
@@ -75,7 +76,7 @@ export default function UserBindRequests() {
 		{
 			fieldName: "Created At",
 			name: "creation_date",
-			type: "text",
+			type: "date",
 			inForm: true
 			
 		},
@@ -83,12 +84,14 @@ export default function UserBindRequests() {
 			fieldName: "Maquette Request on UI",
 			name: "maq_request",
 			type: "text",
+			isLongText: true,
 			inForm: true
 			
 		},
 		{
 			fieldName: "Anti Fraud Response",
 			name: "impression_response",
+			isLongText: true,
 			type: "text",
 			inForm: true
 		}

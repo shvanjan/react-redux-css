@@ -1,8 +1,9 @@
+
 import * as React from 'react';
 
 import "./form.scss";
 import nw from "../network/network_requests";
-import {REQUEST_NAMES, METHOD_TYPES} from "../network/network_enums";
+import {REQUEST_NAMES, METHOD_TYPES, REST_PARAMS} from "../network/network_enums";
 
 export default function Form({formData, formFields, 
 	requestName, method, 
@@ -15,7 +16,7 @@ export default function Form({formData, formFields,
 					closeMethod(data);
 				});
 			}}>
-			<div className = "form_black_bg" onClick = {() => closeMethod()}>
+			<div className = "form_black_bg" onClick = {() => closeMethod(false)}>
 				<div className = "form_white_bg" onClick = {(e) => e.stopPropagation()}>
 					<FormHeader {...{heading: heading, method}}/>
 					<fieldset>
@@ -28,7 +29,7 @@ export default function Form({formData, formFields,
 						 {showCancel && <button className="cancel-button" onClick={(e) => {
 						 	// clearFields();
 						 	e.preventDefault();
-						 	closeMethod();
+						 	closeMethod(false);
 						 }} >Cancel</button>}
 					</div>):null}
 				</div>
@@ -70,8 +71,8 @@ export function FormField({method, fieldName, value,
 	 name, placeholder, type = "number", 
 	 isForeignKey = false, forgein_key_info,
 	 required = true, range, editMode,
-	closeInput}) {
-	const [inputValue, setValue] = React.useState(value||"");
+	closeInput, isLongText}) {
+	const [inputValue, setValue] = React.useState(value||getDefaultValue(type, method));
 	const [listLoaded, setListLoaded] = React.useState(false);
 	const [foreignKeyList, setList] = React.useState([]);
 	placeholder = placeholder || fieldName;
@@ -83,7 +84,7 @@ export function FormField({method, fieldName, value,
 		type = "datetime-local";
 		step = 1;
 	}
-
+	
 	React.useEffect(() => {
 		if(isForeignKey) {
 			 const  {
@@ -124,25 +125,49 @@ export function FormField({method, fieldName, value,
 					editMode && closeInput && closeInput();
 				};
 
-	if(!isForeignKey && !range) {
-
-	return (<div className = {className}> 	
-				<label htmlFor={name}>{fieldName}</label>
-				<input className="form_input" type={type} placeholder={placeholder} 
-				value={inputValue} required={required} name={name}
-				step={step}
-				ref={(node)=>inputNode=node}
-				onKeyDown = {
-					(e) => {
+	const onKeyDown = (e) => {
 						if(e.keyCode == 13) {
 							e.preventDefault();
 							editMode &&  closeInput && closeInput(e.target.value, true);
 						}
-					}
-				}
+					};
+				
+
+	const propsObj = {
+		className: "form_input",
+		type,
+		placeholder,
+		value: inputValue,
+		required,
+		name,
+		step,
+		onChange,
+		onBlur,
+		onKeyDown
+	}
+
+	if(!isForeignKey && !range) {
+
+	return (<div className = {className}> 	
+				<label htmlFor={name}>{fieldName}</label>
+				{/*<input className="form_input" type={type} placeholder={placeholder} 
+				value={inputValue} required={required} name={name}
+				step={step}
+				ref={(node)=>inputNode=node}
+				onKeyDown = {onKeyDown}
 				onChange = {onChange}
 				onBlur = {onBlur}
-				/>
+				/>*/}
+				<>
+				{isLongText && <textarea {...{...propsObj}}
+				ref={(node)=>inputNode=node}/>}
+
+
+				{!isLongText && <input {...{...propsObj}}
+				ref={(node)=>inputNode=node}
+				/>}
+				</>
+
 			</div>);
 	} else {
 
@@ -152,13 +177,10 @@ export function FormField({method, fieldName, value,
 			<div className = {className}> 	
 				<label htmlFor={name}>{fieldName}</label>
 				<DropDownInput {...{
-					inputValue, 
 					rangeOfValues: range || foreignKeyList, 
 					method,
-					required,
-					name,
 					isForeignKey, keyName: isForeignKey && forgein_key_info.keyName,
-					setValue, onBlur, onChange}}/>
+					setValue, ...propsObj}}/>
 
 				
   		</div>):null;
@@ -167,21 +189,19 @@ export function FormField({method, fieldName, value,
 }
 
 
-
-function DropDownInput({inputValue, rangeOfValues, 
-	isForeignKey, required, keyName, name, setValue, method,
-onChange, onBlur}) {
-	let inputNode;
-	React.useEffect(() => {
-		inputNode && inputNode.focus();
-	}, [inputNode]);
+function DropDownInput({rangeOfValues, 
+	isForeignKey, keyName, setValue, method,
+	...propsObj}) {
+		let inputNode;
+		React.useEffect(() => {
+			inputNode && inputNode.focus();
+		}, [inputNode]);
+	
+	let {value: inputValue} = propsObj;
 
 	return (
-		<select className="form_input" value={inputValue} required={required} name={name}
-			onChange = {onChange}
-			onBlur = {onBlur}
+		<select {...{...propsObj}}
 			ref={(node)=>inputNode=node}
-
 			>
 			{method !== METHOD_TYPES.GET? (<>
 				{rangeOfValues.map((foreignKeyRow) => {
@@ -195,6 +215,34 @@ onChange, onBlur}) {
 		);
 }
 
+
+// function DropDownInput({inputValue, rangeOfValues, 
+// 	isForeignKey, required, keyName, name, setValue, method,
+// 	onChange, onBlur}) {
+// 	let inputNode;
+// 	React.useEffect(() => {
+// 		inputNode && inputNode.focus();
+// 	}, [inputNode]);
+
+// 	return (
+// 		<select className="form_input" value={inputValue} required={required} name={name}
+// 			onChange = {onChange}
+// 			onBlur = {onBlur}
+// 			ref={(node)=>inputNode=node}
+
+// 			>
+// 			{method !== METHOD_TYPES.GET? (<>
+// 				{rangeOfValues.map((foreignKeyRow) => {
+// 					let value = isForeignKey? foreignKeyRow[keyName] : foreignKeyRow;
+// 					return <option key={value} value={value}>{value}</option>
+
+// 				})}
+			    
+// 			</>): (<><option value={inputValue}>{inputValue}</option></>)}
+// 			</select>
+// 		);
+// }
+
 function submitForm(event, requestName, method, inputData, formFields, keyField, callback) {
 	event.preventDefault();
 
@@ -205,14 +253,21 @@ function submitForm(event, requestName, method, inputData, formFields, keyField,
 
 
 	console.log(formData);
-	let rest_param = [];
+	let rest_param = [REST_PARAMS[method]];
 	if(method == METHOD_TYPES.PUT || method == METHOD_TYPES.DELETE) {
-		rest_param[0] = inputData[keyField];
+		// rest_param[0] = inputData[keyField];
+		formData[keyField] = inputData[keyField];
 	}
+
+
+
 	if(requestName === REQUEST_NAMES.LOGIN) {
+		rest_param = [];
 		nw.setAuthToken(formData["user"], formData["password"]);
 	}	
-	nw.request(requestName, method, rest_param, JSON.stringify(formData), callback);
+
+	// nw.request(requestName, method, rest_param, JSON.stringify(formData), callback);
+	nw.request(requestName, METHOD_TYPES.POST, rest_param, JSON.stringify(formData), callback);
 	return;
 
 }
@@ -242,4 +297,33 @@ function clearFields() {
 	Array.prototype.forEach.apply(allFormInputs, [(input) => {
 		// formData[input.name] = input.value;
 	}]);
+}
+
+
+function getDefaultValue(type, method) {
+	let defaultValue;
+	if(method === METHOD_TYPES.POST) {
+		switch(type) {
+			case "text":
+				defaultValue = "abc";
+				break;
+			case "url": 
+				defaultValue = "https://default.com";
+				break;
+			case "date":
+				const d = new Date();
+
+				defaultValue = d.toISOString();
+				defaultValue = defaultValue.split(".")[0];
+				break;
+			case "number": 
+				defaultValue = 1;
+				break;
+			default:
+				defaultValue = "";
+				break;
+		}
+	}
+
+	return defaultValue;
 }

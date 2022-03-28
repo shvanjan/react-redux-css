@@ -1,6 +1,7 @@
 import DBTable from "../components/DBTable2";
 import {REQUEST_NAMES, METHOD_TYPES} from "../network/network_enums";
 import {CURRENCY_ENUMS} from "../constants";
+import processFormFeilds from "../processFormFeilds";
 
 export default function CampaignsTable() {
 	/*
@@ -185,7 +186,7 @@ is_active
 			fieldName: "Created Date",
 			name: "created_date",
 			type: "date",
-			inForm: true
+			inForm: false
 		},
 		{
 			fieldName: "Is Active",
@@ -200,7 +201,7 @@ is_active
 	let requestName = REQUEST_NAMES.CAMPAIGNS;
 
 	let rowName = "Campaign";
-
+	processFormFeilds(formFields, true);
 
 	return (
 		<DBTable key={rowName} {...{

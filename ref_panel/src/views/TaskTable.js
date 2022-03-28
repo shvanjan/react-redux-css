@@ -94,7 +94,7 @@ export default function Tasks() {
 			isForeignKey: true,
 			forgein_key_info: {
 				tableName: REQUEST_NAMES.CAMPAIGNS,
-				keyName: 'campaign_id'
+				keyName: 'campaignId'
 			},
 			inForm: true
 		},
@@ -195,6 +195,12 @@ export default function Tasks() {
 		{
 			name: "referral_source",
 			type: "text",
+			inForm: true
+		},
+		{
+			fieldName: "Is Active",
+			name: "is_active",
+			type: "number",
 			inForm: true
 		}
 

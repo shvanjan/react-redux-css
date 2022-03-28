@@ -4,8 +4,8 @@ import token from "basic-auth-token";
 
 const ONE_SECOND = 1000;
 const WAIT_TIME = 0.1 * ONE_SECOND;
+
 const headers = {
-        "Authorization": "Basic ZGs6cXdlcg==",
         "Content-Type": "application/json",
         'Accept': 'application/json'
     }
@@ -70,9 +70,10 @@ const nw = {
     },  
 
     setAuthToken: function(userName, password) {
-        var a = btoa(userName, password);
-        console.log("a = " + a);
-       // headers.Authorization = "Basic " + a;
+        var a = btoa(userName + ":" + password);
+        console.log(a);
+
+        headers.Authorization = "Basic " + a;
     } 
 
 

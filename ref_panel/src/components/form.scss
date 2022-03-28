@@ -73,8 +73,17 @@ label {
     margin-top: 4px ;
 }
 
-.in-place-edit .form_input {
+.in-place-edit {
+}
+
+.in-place-edit .form_input[type="text"] {
 	// height: max-content;
+	// height: 100px;
+	// overflow-wrap: break-word;
+}
+
+.in-place-edit textarea {
+	height: 120px;
 }
 
 form button {

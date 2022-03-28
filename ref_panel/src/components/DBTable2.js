@@ -70,7 +70,7 @@ function descendingComparator(a, b, property, dataType) {
           p1 = Number(p1);
           p2 = Number(p2);
           break;
-        case "string": 
+        case "text":
         case "url":
           p1 = p1.toLowerCase();
           p2 = p2.toLowerCase();
@@ -79,6 +79,7 @@ function descendingComparator(a, b, property, dataType) {
           p1 = (new Date(p1)).getTime();
           p2 = (new Date(p2)).getTime();
           break;
+
 
       }
       if(p2 < p1) {
@@ -235,7 +236,7 @@ const EnhancedTableToolbar = (props) => {
     rows, setRows, setDataLoaded, 
     dataLoaded,
     searchField, searchFieldName, 
-          setPage, rowName, openForm } = props;
+          setPage, rowName, openForm, IS_LOGS } = props;
 
   return (
     <Toolbar
@@ -287,7 +288,7 @@ const EnhancedTableToolbar = (props) => {
         <SearchInput {...{rows, setRows, setDataLoaded, 
           searchField, searchFieldName, dataLoaded,
           setPage}}/>
-        <AddEntryIcon {...{rowName, openForm}}/>
+        {!IS_LOGS && <AddEntryIcon {...{rowName, openForm}}/>}
       </div>
     </Toolbar>
   );
@@ -316,6 +317,8 @@ export default function EnhancedTable({requestName, formFields,
   const [formData, setFormData] = React.useState({});
   const [dataLoaded, setDataLoaded] = React.useState(false);
   const [method, setCurrentMethod] = React.useState(null);
+  const [totalPages, setTotalPages] = React.useState(0);
+  const IS_LOGS = requestName.includes('logs');
 
 
 
@@ -330,14 +333,17 @@ export default function EnhancedTable({requestName, formFields,
    }, [keyField])
 
   React.useEffect(() => {
-      const IS_LOGS = requestName.includes('logs');
       const rest_params = [];
       if(IS_LOGS) {
-        rest_params.push(1, 1);
+        let page_no = page;
+        let page_size = rowsPerPage;
+        rest_params.push(page, rowsPerPage);
       }
+
      !dataLoaded && nw.request(requestName, METHOD_TYPES.GET, rest_params).then((data) => {
       const dataList = IS_LOGS? data.page.content: data.list;
       setRows(dataList);
+      IS_LOGS && setTotalPages(data.page.totalPages);
       setDataLoaded(true);
     }, () => {
       setRows([]);
@@ -385,12 +391,20 @@ export default function EnhancedTable({requestName, formFields,
   };
 
   const handleChangePage = (event, newPage) => {
+
     setPage(newPage);
+    if(IS_LOGS) {
+      setDataLoaded(false);
+    }
+
   };
 
   const handleChangeRowsPerPage = (event) => {
     setRowsPerPage(parseInt(event.target.value, 10));
     setPage(0);
+    if(IS_LOGS) {
+      setDataLoaded(false);
+    }
   };
 
   const handleChangeDense = (event) => {
@@ -409,14 +423,17 @@ export default function EnhancedTable({requestName, formFields,
     return 'loading...';
   }
 
+  let rowsToShow = IS_LOGS? stableSort(rows, getComparator(order, orderBy, formFields)): (stableSort(rows, getComparator(order, orderBy, formFields))
+                .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage));
+
   return (
     <Box  className={styles.db_table_parent} sx={{ width: '100%' }}>
       <Paper sx={{ width: '100%', mb: 2, overflow: 'hidden' }}>
         <EnhancedTableToolbar {...{
           rows, setRows, setDataLoaded,
           dataLoaded, 
-    searchField, searchFieldName, 
-          setPage, rowName, openForm}} title={rowName} numSelected={selected.length} />
+          searchField, searchFieldName, 
+          setPage, rowName, openForm, IS_LOGS}} title={rowName} numSelected={selected.length} />
         <TableContainer   className={styles.db_table}>
           <Table stickyHeader
             sx={{ minWidth: 750 }}
@@ -435,9 +452,7 @@ export default function EnhancedTable({requestName, formFields,
             <TableBody>
               {/* if you don't need to support IE11, you can replace the `stableSort` call with:
                  rows.slice().sort(getComparator(order, orderBy)) */}
-              {stableSort(rows, getComparator(order, orderBy, formFields))
-                .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
-                .map((row, index) => {
+              {rowsToShow.map((row, index) => {
                   const isItemSelected = isSelected(row[keyField]);
                   const labelId = `enhanced-table-checkbox-${index}`;
 
@@ -465,7 +480,7 @@ export default function EnhancedTable({requestName, formFields,
         <TablePagination
           rowsPerPageOptions={[5, 10, 25]}
           component="div"
-          count={rows.length}
+          count={IS_LOGS? totalPages:rows.length}
           rowsPerPage={rowsPerPage}
           page={page}
           onPageChange={handleChangePage}
@@ -482,13 +497,15 @@ export default function EnhancedTable({requestName, formFields,
       (<Form {...{
         heading: rowName, 
         formData, 
-        requestName, 
+        requestName: requestName, 
         formFields,  
         method,
         keyField,
-        closeMethod: () => {
+        closeMethod: (dataChanged = true) => {
           setShowForm(false);
-          setDataLoaded(false);
+          if(dataChanged) {
+            setDataLoaded(false);
+          }
         }
       }
       }/>
