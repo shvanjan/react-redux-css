@@ -1,5 +1,8 @@
 export default function processFormFeilds(formFields, convertName = false) {
 	formFields.forEach((field) => {
+		if(typeof field.name !== "string") {
+			return;
+		}
 		let {fieldName, name} = field;
 		
 		let name_parts = field.name.split("_");

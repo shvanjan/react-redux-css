@@ -82,7 +82,8 @@ referrer_amount_per_slab(Referrer/Referred amount slab)
 			fieldName: "Id",
 			name: "id",
 			type: "number",
-			inForm: false
+			inForm: false,
+			doNotShow: true
 
 		},
 		{
@@ -123,8 +124,10 @@ referrer_amount_per_slab(Referrer/Referred amount slab)
 			
 		},
 		{
-			name: "campaign_id",
+			name: "campaign",
 			type: "text",
+			nameParts: ["campaignId", "campaignTitle"],
+			keyName: "campaign_id",
 			inForm: true,
 			isForeignKey: true,
 			forgein_key_info: {
@@ -134,8 +137,16 @@ referrer_amount_per_slab(Referrer/Referred amount slab)
 			inForm: true
 		},
 		{
-			name: "task_id",
+			name: "task",
+			keyName: "task_id",
+			nameParts: ["task_id", "task_title"],
 			type: "text",
+			isForeignKey: true,
+
+			forgein_key_info: {
+				tableName: REQUEST_NAMES.TASKS,
+				keyName: 'task_id'
+			},
 			inForm: true
 			
 		},
@@ -161,36 +172,37 @@ referrer_amount_per_slab(Referrer/Referred amount slab)
 			inForm: true
 		},
 		{
+			fieldName: "Total Max Count",
 			name: "max_count",
 			type: "number",
 			inForm: true
 		},
 		{
-			fieldName: "Referrer Per user daily gratification limit",
+			fieldName: "User Daily Gratification Limit from referred",
 			name: "per_referred_daily_gratification_limit",
 			type: "number",
 			inForm: true
 		},
 		{
-			fieldName: "Referrer Per user max gratification limit",
+			fieldName: "User Max Gratification Limit from referred",
 			name: "per_referred_max_gratification_limit",
 			type: "number",
 			inForm: true
 		},
 		{
-			fieldName: "Referrer Per user daily max count",
+			fieldName: "User Daily Max Count from referred",
 			name: "per_referred_daily_max_count",
 			type: "number",
 			inForm: true
 		},
 		{
-			fieldName: "Referrer Per user max count",
+			fieldName: "User Max Count from referred",
 			name: "per_referred_max_count",
 			type: "number",
 			inForm: true
 		},
 		{
-			fieldName: "Referrer/Referred amount slab",
+			fieldName: "Slabwise Amount",
 			name: "referrer_amount_per_slab",
 			type: "text",
 			isLongText: true,
@@ -199,6 +211,7 @@ referrer_amount_per_slab(Referrer/Referred amount slab)
 		{
 			fieldName: "Is Active",
 			name: "is_active",
+			isCustom: true,
 			type: "number",
 			inForm: true
 		}

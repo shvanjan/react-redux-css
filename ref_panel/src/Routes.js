@@ -1,4 +1,5 @@
 import { useSelector, useDispatch } from 'react-redux';
+import React from "react";
 import {
   BrowserRouter as Router,
   Routes,
@@ -22,6 +23,9 @@ import UserMappings from "./views/UserMappings";
 import LogsGratification from "./views/LogsGratification";
 import LogsTask from "./views/LogsTask";
 
+import UsersTable from "./views/UsersTable";
+
+
 import LoginPage from "./views/LoginPage";
 import {REQUEST_NAMES} from "./network/network_enums";
 
@@ -35,11 +39,11 @@ import {REQUEST_NAMES} from "./network/network_enums";
     {
       type: TABLE_TYPES.CONFIGURATION,
       tables: [
-      	{
-          name: 'Campaigns',
-          dbName: REQUEST_NAMES.CAMPAIGNS,
-          component: CampaignsTable
-        }, 
+      	// {
+       //    name: 'Campaigns',
+       //    dbName: REQUEST_NAMES.CAMPAIGNS,
+       //    component: CampaignsTable
+       //  }, 
         {
           name: 'Tasks',
           dbName: REQUEST_NAMES.TASKS,
@@ -82,8 +86,8 @@ import {REQUEST_NAMES} from "./network/network_enums";
       type: TABLE_TYPES.ADMIN,
       tables: [{
           name: 'Users',
-          dbName: 'Users',
-          component: TeamsTable
+          dbName: REQUEST_NAMES.USERS,
+          component: UsersTable
 
         }
       ]
@@ -144,7 +148,8 @@ function PermissionDenied() {
 export function RouteLinks() {
   const isAuthenticated = useSelector(state => state.login.isAuthenticated);
 	let user_permissions = useSelector(state => state.login.userInfo.permissions);
-
+  const currentLink = window.location.pathname;
+  const [activeLink, setActiveLink] = React.useState(currentLink);
     if(isAuthenticated) {
 
 
@@ -156,9 +161,16 @@ export function RouteLinks() {
   	          {type}
   	          <ul className="table_link_list">
   	            {tables.map(({name, dbName}) => {
+                  let path = `/${type}/${dbName}`;
+                  
+                  let isActive = (activeLink == path)? true: false;
   	              return (
-  	                  <li className="table_link" key={dbName}>
-  	                    <Link to={`/${type}/${dbName}`}>{`${name}`}</Link>
+  	                  <li className={`table_link ${isActive? 'active': ''}`} key={dbName} onClick={
+                        () => {
+                          setActiveLink(path);
+                        }
+                      }>
+  	                    <Link to={path}>{`${name}`}</Link>
   	                  </li>
   	                )
   	            })}

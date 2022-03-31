@@ -1,3 +1,15 @@
+.cm-loader {
+	position: absolute;
+    z-index: 10;
+    align-items: center;
+    justify-content: center;
+    display: flex;
+    width: 100%;
+    height: 100%;
+    top: 0;
+    left: 0;
+}
+
 [class^=MuiTableRow] {
 	// color: blue;
 	max-height: 100px;
@@ -10,7 +22,7 @@
 	overflow-wrap: break-word;
 	// overflow-wrap: normal;
 	position: relative;
-	max-width: 250px;
+	min-width: 100px;
 	padding: 15px;
 	// color: red;
 	// max-height: 200px;
@@ -168,7 +180,7 @@
 // }
 
 .add_div {
-	background-color: #3f51b5;
+	background-color: #1a73e8;
 	height: 30px;
 	// width: ;
 	color: white;
@@ -227,4 +239,58 @@ th, tr, td {
 
 .icons_cell {
 	width: fit-content;
+}
+
+
+span.custom.status.MAPPED {
+
+}
+
+
+
+.custom.status span {
+
+}
+
+.number.is_active span {
+	display: none;
+}
+
+.custom.status::before {
+	content: "";
+	margin: auto;
+	width: 10px;
+	height: 10px;
+	border-radius: 50%;
+	color: blue;
+	background-color: red;
+	display: block;
+}
+
+.custom.status.MAPPED::before {
+	
+	background-color: green;
+}
+
+.custom.status.INIT::before {
+	
+	background-color: yellow;
+}
+
+.number.is_active {
+    background-image: url(../../public/on_button.png);
+    background-position: 0px 3px;
+    width: 50px;
+    display: inline-block;
+    height: 50px;
+    margin-left: 0px;
+    background-size: cover;
+    background-repeat: no-repeat
+}
+
+.number.is_active.\30 {
+    background-image: url(../../public/off_button.jpeg);
+    background-position: 0;
+    width: 40px;
+    height: 40px;
 }

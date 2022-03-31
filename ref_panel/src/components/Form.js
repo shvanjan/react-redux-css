@@ -1,40 +1,55 @@
 
 import * as React from 'react';
+import { useSelector, useDispatch } from 'react-redux';
 
 import "./form.scss";
 import nw from "../network/network_requests";
 import {REQUEST_NAMES, METHOD_TYPES, REST_PARAMS} from "../network/network_enums";
+import Loader from "../components/Loader";
 
-export default function Form({formData, formFields, 
+import {getForeignKeyObject} from "../utilities/customFields";
+
+export default function Form({formData = {}, formFields = [], 
 	requestName, method, 
 	heading, closeMethod, 
-	keyField, showCancel = true}) {
+	keyField, showCancel = true, message}) {
+
+	const dispatch = useDispatch();
+
+	const [disabled, setDisabled] = React.useState(false);
 
 	return (
-			<form role = "form"  onSubmit = {(e) =>  {
-				submitForm(e, requestName, method, formData, formFields, keyField, (data) => {
-					closeMethod(data);
-				});
-			}}>
-			<div className = "form_black_bg" onClick = {() => closeMethod(false)}>
+			
+			<div className = {`form_black_bg ${requestName.split("/")[1] || requestName.split("/")[0]}`} onClick = {() => !disabled && closeMethod(false)}>
 				<div className = "form_white_bg" onClick = {(e) => e.stopPropagation()}>
 					<FormHeader {...{heading: heading, method}}/>
+					<form role = "form"  onSubmit = {(e) =>  {
+						submitForm(e, requestName, method, formData, formFields, keyField, (data) => {
+							closeMethod(data);
+						}, (e) => {
+							setDisabled(false);
+							console.log(e + "error occured")
+						}, dispatch);
+						setDisabled(true);
+					}}>
 					<fieldset>
 						<FieldList {...{formData, formFields, method}}/>
 					</fieldset>
 
-					{(method !== METHOD_TYPES.GET)?
+
+					{(method && method !== METHOD_TYPES.GET)?
 					(<div className = "form_field form_footer">
-						<button type = "submit" className="submit-button" >Submit</button>
-						 {showCancel && <button className="cancel-button" onClick={(e) => {
+						<button type = "submit" className="submit-button" disabled={disabled} >Submit</button>
+						 {showCancel && <button className="cancel-button" disabled={disabled} onClick={(e) => {
 						 	// clearFields();
 						 	e.preventDefault();
 						 	closeMethod(false);
 						 }} >Cancel</button>}
 					</div>):null}
+					</form>
 				</div>
+				{disabled && <Loader/>}
 			</div>
-			</form>
 
 		)
 }
@@ -71,7 +86,8 @@ export function FormField({method, fieldName, value,
 	 name, placeholder, type = "number", 
 	 isForeignKey = false, forgein_key_info,
 	 required = true, range, editMode,
-	closeInput, isLongText}) {
+	closeInput, isLongText, ...fieldData}) {
+	const dispatch = useDispatch();
 	const [inputValue, setValue] = React.useState(value||getDefaultValue(type, method));
 	const [listLoaded, setListLoaded] = React.useState(false);
 	const [foreignKeyList, setList] = React.useState([]);
@@ -85,22 +101,13 @@ export function FormField({method, fieldName, value,
 		step = 1;
 	}
 	
-	React.useEffect(() => {
+	React.useEffect(async () => {
 		if(isForeignKey) {
-			 const  {
-				tableName,
-				keyName,
-			} = forgein_key_info;
-
-			// let requestName = tab
-
-			nw.request(tableName, METHOD_TYPES.GET).then((data) => {
-		      setList([...data.list]);
-		      setListLoaded(true);
-		    }, () => {
-		      setListLoaded(false);
-		    });
-
+			const tempObj = await getForeignKeyObject({name, forgein_key_info, ...fieldData}, dispatch)
+			const list = [];
+			Object.keys(tempObj).forEach((id) => list.push(tempObj[id]));
+			setList(list);
+			setListLoaded(true);
 		}
 	}, [listLoaded])
 
@@ -204,8 +211,7 @@ function DropDownInput({rangeOfValues,
 			ref={(node)=>inputNode=node}
 			>
 			{method !== METHOD_TYPES.GET? (<>
-				{rangeOfValues.map((foreignKeyRow) => {
-					let value = isForeignKey? foreignKeyRow[keyName] : foreignKeyRow;
+				{rangeOfValues.map((value) => {
 					return <option key={value} value={value}>{value}</option>
 
 				})}
@@ -243,7 +249,8 @@ function DropDownInput({rangeOfValues,
 // 		);
 // }
 
-function submitForm(event, requestName, method, inputData, formFields, keyField, callback) {
+async function submitForm(event, requestName, method,
+ inputData, formFields, keyField, callback, errorCallback, dispatch) {
 	event.preventDefault();
 
 	let allFormInputs = document.getElementsByTagName("form")[0].
@@ -267,14 +274,20 @@ function submitForm(event, requestName, method, inputData, formFields, keyField,
 	}	
 
 	// nw.request(requestName, method, rest_param, JSON.stringify(formData), callback);
-	nw.request(requestName, METHOD_TYPES.POST, rest_param, JSON.stringify(formData), callback);
+	try {
+		let response = await nw.request(requestName, METHOD_TYPES.POST, rest_param, JSON.stringify(formData), callback, dispatch);
+
+	} catch(e) {
+		errorCallback(e);
+	}
+	
 	return;
 
 }
 
 function getFormData(formFields) {
 	let formData = {};
-	formFields.forEach(({name, type, inForm, fields}) => {
+	formFields.forEach(({name, nameParts, type, inForm, fields, isForeignKey}) => {
 
 		if(type === "json") {
 			formData[name] = getFormData(fields);
@@ -282,6 +295,13 @@ function getFormData(formFields) {
 			if(inForm) {
 				let val = document.getElementsByName(name)[0].value;
 				formData[name] = val;
+
+				if(isForeignKey && nameParts) {
+					let valParts = val.split(" - ");
+					nameParts.forEach((part, i) => {
+						formData[part] = valParts[i];
+					});
+				}
 			}
 		}
 	});

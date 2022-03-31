@@ -14,6 +14,7 @@ import Checkbox from '@mui/material/Checkbox';
 import { useSelector, useDispatch } from 'react-redux';
 import {FormField} from "../components/Form";
 import ArrowRightIcon from '@mui/icons-material/ArrowRight';
+import Loader from "../components/Loader";
 
 const SORT_ORDERS = {
   ASC: 1,
@@ -109,6 +110,7 @@ export function DBTableRow({requestName, formFields, setDataLoaded,
    handleClick, isItemSelected, labelId, 
   ...data}) {
 
+  let dispatch = useDispatch();
   let row = {...data};
   const IS_LOGS = requestName.includes('logs');
   let hasWritePermission = useSelector(state => state.login.userInfo.permissions.can_edit) && !IS_LOGS;
@@ -120,7 +122,7 @@ export function DBTableRow({requestName, formFields, setDataLoaded,
       console.log(updated_data);
       nw.request(requestName, METHOD_TYPES.POST, rest_param, JSON.stringify(updated_data), () => {
         setDataLoaded(false);
-      });
+      }, dispatch);
    } 
 
    function IconsCell(data) {
@@ -206,14 +208,14 @@ export function DBTableRow({requestName, formFields, setDataLoaded,
                           let value = data[fieldName];
 
                           if(type !== "json") {
-                            return <DBTableCell {...{IS_LOGS, value, updateRow, ...fieldData}} key={fieldName}/>
+                            return <DBTableCell {...{IS_LOGS, value, updateRow, data, ...fieldData}} key={fieldName}/>
                           } else {
                             let data2 = data[fieldName];
                             return fields.map(({name: fieldName, type}) => {
 
                               let value = data2[fieldName];
                               
-                              return <DBTableCell {...{IS_LOGS, value, updateRow, ...fieldData}} key={fieldName}/>
+                              return <DBTableCell {...{IS_LOGS, value, updateRow, data, ...fieldData}} key={fieldName}/>
                             })
                           }
 
@@ -226,37 +228,45 @@ export function DBTableRow({requestName, formFields, setDataLoaded,
                   
 }
 
-function DBTableCell({value, updateRow, IS_LOGS, ...fieldData}) {
+function DBTableCell({value, updateRow, IS_LOGS, data, ...fieldData}) {
 
     //expanded - null: no need to expand/ collapse, 
       //false: can be expanded
       // true: can be collapsed
 
+      const dispatch = useDispatch();
     const [editMode, setEditMode] = React.useState(false);
-    const {type, fieldName, name} = fieldData;
     const [expanded, setExpanded] = React.useState(null);
     const [displayValue, setDisplayValue] = React.useState("");
-
-   
+    const {type, fieldName, name} = fieldData;
+     const [disabled, setDisabled] = React.useState(false);
 
     React.useEffect(() => {
+
       if(type === "text" && value && value.length > 100) {
         setExpanded(false);
       } else {
         setExpanded(null);
       }
       
-      setDisplayValue(getDisplayValue(value, type, expanded));
+      setDisplayValue(getDisplayValue({value, type, expanded, ...fieldData}));
+     
     }, [value]);
+
+
     
 
   let hasWritePermission = useSelector(state => state.login.userInfo.permissions.can_edit) &&  !IS_LOGS;
- 
+ let can_edit = hasWritePermission && fieldData.inForm && !fieldData.isCustom && !disabled;
 
   function openEditBox() {
-    if(hasWritePermission && fieldData.inForm) {
+    if(can_edit) {
       setEditMode(true);
     }
+  }
+
+  if(fieldData.doNotShow) {
+    return null;
   }
 
    return (<TableCell className="db-table-cell" align={(type=="number")?"center":"center"} 
@@ -267,19 +277,39 @@ function DBTableCell({value, updateRow, IS_LOGS, ...fieldData}) {
         
         {!editMode &&  (
           <>
+
           <ToggleExpand 
           {...{ expanded, setDisplayValue, setExpanded, value}}/>
 
-          <span className = {type}
+          <span className = {
+              `${type}
+              ${fieldData.isCustom?'custom':''}
+              ${fieldData.name} ${displayValue}`
+            }
             onDoubleClick = {() => {
-              openEditBox();
+               openEditBox();
             }}
+
+            onClick = {() => {
+                let customFieldName = "is_active";
+                if(fieldData.name === customFieldName) {
+                  let old_value = data[customFieldName]
+                  let new_value = 1;
+                  if(old_value === 1) {
+                    new_value = 0;
+                  }
+                  updateRow({
+                    [customFieldName]: new_value
+                  });
+                }
+              }
+            }
           >
             {type === "url"? 
-            <a href = {value}>{displayValue}</a>: <DisplaySpan {...{displayValue, type}}/> }
+            <a href = {value}>{displayValue}</a>: <DisplaySpan {...{displayValue, type, ...fieldData}}/> }
           </span>
 
-          {hasWritePermission && fieldData.inForm && (<EditIcon
+          {can_edit && (<EditIcon
           className="in-place-edit-icon"
           onClick={() => {
             openEditBox();
@@ -297,9 +327,17 @@ function DBTableCell({value, updateRow, IS_LOGS, ...fieldData}) {
             editMode: true,
             closeInput: (new_value, submitted) => {
               if(submitted && new_value != value) {
-                updateRow({
+                let new_data = {
                   [name]: new_value
-                });
+                };
+                if(fieldData.isForeignKey && fieldData.nameParts) {
+
+                  let valParts = new_value.split(" - ");
+                  fieldData.nameParts.forEach((part, i) => {
+                    new_data[part] = valParts[i];
+                  });
+                }
+                updateRow(new_data);
               }
               
               setEditMode(false);
@@ -308,23 +346,28 @@ function DBTableCell({value, updateRow, IS_LOGS, ...fieldData}) {
           }}/>
         }
 
-        
+        {
+          disabled && <Loader/>
+        }
         
     </TableCell>)
 }
 
-function DisplaySpan({displayValue, type}) {
+function DisplaySpan({displayValue, type, ...fieldData}) {
   let dots = "....";
   let dotted = displayValue && type === "text" && displayValue.includes("....");
   if(dotted) {
     let parts = displayValue.split("....")
     return (<> 
         {parts[0]}
-        <span className="dotted">....</span>
+        <span className={`dotted`}>....</span>
         {parts[1]}
       </>);
   } else {
-    return <>{displayValue}</>
+    return (<>
+      <span className={''}>
+         {displayValue}</span>
+         </>)
   }
 
 }
@@ -336,7 +379,7 @@ function ToggleExpand({expanded, setDisplayValue, setExpanded, value}) {
   }
 
   let finalExpanded = !expanded;
-  let finalDisplayValue = getDisplayValue(value, "text", finalExpanded);
+  let finalDisplayValue = getDisplayValue({value, type: "text", expanded:finalExpanded});
   let spanText = expanded? "<<": ">>";
 
   return <span className={"expand-collapse-cell " + expanded} onClick = {() => {
@@ -346,10 +389,12 @@ function ToggleExpand({expanded, setDisplayValue, setExpanded, value}) {
 
 }
 
-function getDisplayValue(value, type, expanded) {
+function getDisplayValue({value, type, expanded, name}) {
   // function Dotted(){
   //   return (<span>....</span>);
   // }
+
+  
 
   if(type === "text" && value && value.length > 100) {
       let len = value.length;
@@ -361,6 +406,3 @@ function getDisplayValue(value, type, expanded) {
     }
 
 }
-
-
-

@@ -52,18 +52,11 @@ function createFields(fieldsArr) {
 }
 
 window.createFields = createFields;
-window.arr = ["task_id", 
-"campaign_id", 
-"referrer_user_id", 
-"referred_user_id", 
-"referrer_earnings", 
-"referred_earnings", 
-"referrer_currency", 
-"referred_currency", 
-"task_engine_txn_id", 
-"transaction_date", 
-"referrer_params", 
-"referred_params"];
+window.arr = ["id",
+"userName",
+"password",
+"active",
+"roles"];
 
-console.log(createFields(window.arr));
+// console.log(createFields(window.arr));
 

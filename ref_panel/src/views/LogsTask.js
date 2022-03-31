@@ -53,7 +53,8 @@ export default function LogsTask() {
 			fieldName: "Id",
 			name: "id",
 			type: "number",
-			inForm: false
+			inForm: false,
+            doNotShow: true
 
 	},
     {

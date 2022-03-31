@@ -1,5 +1,6 @@
 import * as React from 'react';
 import PropTypes from 'prop-types';
+
 import { alpha } from '@mui/material/styles';
 import Box from '@mui/material/Box';
 import Table from '@mui/material/Table';
@@ -21,20 +22,24 @@ import Switch from '@mui/material/Switch';
 import DeleteIcon from '@mui/icons-material/Delete';
 import FilterListIcon from '@mui/icons-material/FilterList';
 import { visuallyHidden } from '@mui/utils';
-
-
 import AddIcon from "@material-ui/icons/AddCircleOutline";
-import nw from "../network/network_requests";
 import Form from "../components/Form";
-import {DBTableHeader, DBTableRow, AddEntryIcon} from "./DbTableComps";
-import "./table.scss";
-import {METHOD_TYPES} from "../network/network_enums";
 import SearchIcon from "@material-ui/icons/Search";
 import InputBase from "@material-ui/core/InputBase";
+
+import "./table.scss";
 import styles from "../index.module.css";
 
+import nw from "../network/network_requests";
+import {METHOD_TYPES} from "../network/network_enums";
 
+import {DBTableHeader, DBTableRow, AddEntryIcon} from "./DbTableComps";
 import processFormFeilds from "../processFormFeilds";
+import Loader from "../components/Loader";
+import {getForeignKeyObject} from "../utilities/customFields";
+
+import { useSelector, useDispatch } from 'react-redux';
+
 
 function createData(name, calories, fat, carbs, protein) {
   return {
@@ -65,6 +70,11 @@ const rows_old = [
 function descendingComparator(a, b, property, dataType) {
       let p1 = a[property];
       let p2 = b[property];
+      if(!p2) {
+        return 1;
+      } else if(!p1) {
+        return -1;
+      }
       switch(dataType) {
         case "number": 
           p1 = Number(p1);
@@ -166,6 +176,9 @@ function EnhancedTableHead(props) {
 
     const columnHeads = (headCells) =>  {
       return headCells.map((headCell) => {
+        if(headCell.doNotShow) {
+          return null;
+        }
 
         if(headCell.type == 'json') {
           return columnHeads(headCell.fields);
@@ -319,6 +332,7 @@ export default function EnhancedTable({requestName, formFields,
   const [method, setCurrentMethod] = React.useState(null);
   const [totalPages, setTotalPages] = React.useState(0);
   const IS_LOGS = requestName.includes('logs');
+      const dispatch = useDispatch();
 
 
 
@@ -340,11 +354,50 @@ export default function EnhancedTable({requestName, formFields,
         rest_params.push(page, rowsPerPage);
       }
 
-     !dataLoaded && nw.request(requestName, METHOD_TYPES.GET, rest_params).then((data) => {
+      let allPromises = [];
+
+      Promise.all(allPromises).then(() => {
+
+      })
+
+    !dataLoaded && nw.request(requestName, METHOD_TYPES.GET, 
+       rest_params).then((data) => {
       const dataList = IS_LOGS? data.page.content: data.list;
       setRows(dataList);
       IS_LOGS && setTotalPages(data.page.totalPages);
-      setDataLoaded(true);
+
+      let allPromises = [];
+
+
+      formFields.forEach((fieldData) => {
+        let promise = new Promise((resolve, reject) => {
+          
+            if(fieldData.isForeignKey && fieldData.nameParts) {
+              let prom = getForeignKeyObject(fieldData, dispatch);
+              prom.then((tempObj) => {
+                let name = fieldData.name;
+                let keyName = fieldData.keyName;
+                dataList.forEach((row) => {
+                  // row[]
+                  row[name] = tempObj[row[keyName]];
+                  var a = row[name];
+                });
+                resolve();
+              });
+            } else {
+              resolve();
+            }
+        });
+
+        allPromises.push(promise);
+
+      });
+
+      Promise.all(allPromises).then(() => {
+        setDataLoaded(true);
+
+      });
+
     }, () => {
       setRows([]);
       setDataLoaded(true);
@@ -420,7 +473,7 @@ export default function EnhancedTable({requestName, formFields,
   processFormFeilds(formFields);
 
   if(!dataLoaded) {
-    return 'loading...';
+    return <Loader/>;
   }
 
   let rowsToShow = IS_LOGS? stableSort(rows, getComparator(order, orderBy, formFields)): (stableSort(rows, getComparator(order, orderBy, formFields))

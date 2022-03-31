@@ -43,7 +43,8 @@ re_txn_id
 			fieldName: "Id",
 			name: "id",
 			type: "number",
-			inForm: false
+			inForm: false,
+         	doNotShow: true
 
 		},
 		{

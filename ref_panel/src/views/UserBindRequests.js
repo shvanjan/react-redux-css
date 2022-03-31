@@ -7,6 +7,7 @@ export default function UserBindRequests() {
 		campaign_id
 	campaign_property
 	referrer_masked_msisdn (Referrer MaskId)
+	referred_masked_msisdn
 	status
 	validation_fail_reason (Mapping Fail Reason)
 	maq_response (maquette Response on UI)
@@ -21,7 +22,8 @@ export default function UserBindRequests() {
 			fieldName: "Id",
 			name: "id",
 			type: "number",
-			inForm: false
+			inForm: false,
+			doNotShow: true
 
 		},
 		{
@@ -45,8 +47,16 @@ export default function UserBindRequests() {
 
 		},
 		{
+			fieldName: "Referred MaskId",
+			name: "referred_masked_msisdn",
+			type: "text",
+			inForm: true
+
+		},
+		{
 			fieldName: "status",
 			name: "status",
+			isCustom: true,
 			type: "text",
 			inForm: true
 			

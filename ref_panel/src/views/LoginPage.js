@@ -21,7 +21,7 @@ export default function LoginPage() {
   let navigate = useNavigate(); 
   let dispatch = useDispatch();
 
-  let from  = location.state?.from?.pathname || '/Configuration/campaigns'
+  let from  = location.state?.from?.pathname || '/Configuration/gratifications'
   let callLogin = (userInfo) => {
     dispatch(login(userInfo));
     navigate(from);

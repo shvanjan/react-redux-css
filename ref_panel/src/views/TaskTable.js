@@ -80,18 +80,21 @@ export default function Tasks() {
 	*/
 
 	let formFields = [
+
 		{
 			fieldName: "Id",
 			name: "id",
 			type: "number",
-			inForm: false
-
+			inForm: false,
+			doNotShow: true
 		},
 		{
-			fieldName: "Campaign Id",
-			name: "campaign_id",
+			fieldName: "Campaign",
+			name: "campaign",
 			type: "text",
 			isForeignKey: true,
+			nameParts: ["campaignId", "campaignTitle"],
+			keyName: "campaign_id",
 			forgein_key_info: {
 				tableName: REQUEST_NAMES.CAMPAIGNS,
 				keyName: 'campaignId'
@@ -200,6 +203,7 @@ export default function Tasks() {
 		{
 			fieldName: "Is Active",
 			name: "is_active",
+			isCustom: true,
 			type: "number",
 			inForm: true
 		}

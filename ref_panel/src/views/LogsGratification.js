@@ -61,7 +61,8 @@ export default function LogsGratification() {
 		fieldName: "Id",
 		"name": "id",
         "type": "number",
-        "inForm": false
+        "inForm": false,
+         doNotShow: true
 	},
     {
         "name": "campaign_id",
